@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Extending the adopted spec, each change should have a link to its corresponding pull request appended.
 
+### [11.2.2](https://www.github.com/terraform-google-modules/terraform-google-project-factory/compare/v11.2.1...v11.2.2) (2021-09-30)
+
+
+### Bug Fixes
+
+* Allow explicit provider configuration in module ([#624](https://www.github.com/terraform-google-modules/terraform-google-project-factory/issues/624)) ([621c527](https://www.github.com/terraform-google-modules/terraform-google-project-factory/commit/621c5275527a0d392a842bd71e7ad88e2eba1835))
+
 ### [11.2.1](https://www.github.com/terraform-google-modules/terraform-google-project-factory/compare/v11.2.0...v11.2.1) (2021-09-23)
 
 
