@@ -21,6 +21,7 @@ locals {
       for r in i.roles :
       { api = i.api, role = r }
     ]
+    if i.api != "compute.googleapis.com"
   ])
 }
 
@@ -39,7 +40,6 @@ resource "google_project_service_identity" "project_service_identities" {
   for_each = {
     for i in var.activate_api_identities :
     i.api => i
-    if i.api != "compute.googleapis.com"
   }
 
   provider = google-beta
