@@ -49,32 +49,37 @@ resource "google_project_service_identity" "project_service_identities" {
   service  = each.value.api
 }
 
-resource "google_project_iam_member" "project_service_identity_roles" {
-  for_each = {
-    for si in local.service_identities :
-    "${si.api} ${si.role}" => si
-    if si.api != "compute.googleapis.com"
-  }
-
-  project = var.project_id
-  role    = each.value.role
-  member  = "serviceAccount:${google_project_service_identity.project_service_identities[each.value.api].email}"
-}
-
 # Process the compute.googleapis.com identity separately, if present in the inputs.
 data "google_compute_default_service_account" "default" {
   count   = local.activate_compute_identity ? 1 : 0
   project = var.project_id
 }
 
-resource "google_project_iam_member" "default_compute_service_identity_roles" {
-  for_each = {
-    for si in local.service_identities :
-    "${si.api} ${si.role}" => si
-    if si.api == "compute.googleapis.com"
+locals {
+  add_service_roles = merge(
+    {
+      for si in local.service_identities :
+      "${si.api} ${si.role}" => {
+        email = google_project_service_identity.project_service_identities[si.api].email
+        role  = si.role
+      }
+      if si.api != "compute.googleapis.com"
+    },
+    {
+      for si in local.service_identities :
+      "${si.api} ${si.role}" => {
+        email = data.google_compute_default_service_account.default[0].email
+        role  = si.role
+      }
+      if si.api == "compute.googleapis.com"
+    }
+  )
+}
 
-  }
+resource "google_project_iam_member" "project_service_identity_roles" {
+  for_each = local.add_service_roles
+
   project = var.project_id
   role    = each.value.role
-  member  = "serviceAccount:${data.google_compute_default_service_account.default[0].email}"
+  member  = "serviceAccount:${each.value.email}"
 }
